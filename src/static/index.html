@@ -117,13 +117,20 @@
     .dashboard-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
-      gap: 24px;
+      gap: 2rem;
       flex-grow: 1;
+    }
+
+    .dashboard-grid > .panel:first-child {
+      min-width: 45%;
     }
 
     @media (max-width: 992px) {
       .dashboard-grid {
         grid-template-columns: 1fr;
+      }
+      .dashboard-grid > .panel:first-child {
+        min-width: 100%;
       }
     }
 
@@ -159,7 +166,7 @@
     textarea.solidity-editor {
       width: 100%;
       flex-grow: 1;
-      min-height: 400px;
+      min-height: 450px;
       background-color: var(--bg-console);
       color: var(--text-primary);
       border: 1px solid var(--border-color);
@@ -170,6 +177,8 @@
       resize: vertical;
       outline: none;
       border-radius: 2px;
+      overflow-x: auto;
+      white-space: pre;
     }
 
     textarea.solidity-editor:focus {
@@ -221,6 +230,7 @@
       border: 1px solid var(--border-color);
       padding: 12px;
       overflow-y: auto;
+      overflow-x: auto;
       font-size: 12px;
       color: var(--text-muted);
       white-space: pre-wrap;
@@ -261,8 +271,10 @@
       padding: 16px;
       border-radius: 2px;
       overflow-y: auto;
+      overflow-x: auto;
       display: flex;
       flex-direction: column;
+      white-space: pre-wrap;
     }
 
     .report-placeholder {
@@ -326,6 +338,7 @@
       border-radius: 2px;
       font-size: 13px;
       white-space: pre-wrap;
+      overflow-x: auto;
     }
 
     .report-raw {
@@ -337,6 +350,9 @@
       border-radius: 2px;
       max-height: 120px;
       overflow-y: auto;
+      overflow-x: auto;
+      white-space: pre-wrap;
+      word-break: break-all;
     }
 
     footer {
@@ -369,7 +385,7 @@
         <span style="color: var(--text-muted); font-size: 10px;">V0.8.20+</span>
       </div>
       <div class="editor-container">
-        <textarea id="solidity-code" class="solidity-editor" spellcheck="false">// SPDX-License-Identifier: MIT
+        <textarea id="solidity-code" class="solidity-editor" spellcheck="false" wrap="off">// SPDX-License-Identifier: MIT
 pragma solidity ^0.8.20;
 
 contract VulnerableBank {
