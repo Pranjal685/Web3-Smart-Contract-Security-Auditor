@@ -1,0 +1,11 @@
+search-path = [
+    ".",
+    "venv/lib/python3.12/site-packages"
+]
+disable-search-path-heuristics = true
+
+project-excludes = ["**/venv/**"]
+
+# Suppress false-positive missing-import errors from Pyrefly analyzing
+# isolated code snippets inside unittest.mock.patch context managers.
+suppress-errors = ["missing-import"]
