@@ -61,3 +61,11 @@ def detect_loop_regex(tool_calls: List[Dict[str, Any]]) -> bool:
     
     match = re.search(pattern, stream)
     return match is not None
+
+MAX_ITERATIONS = 3
+
+class IterationLimitExceeded(Exception):
+    def __init__(self, message: str, last_state: dict):
+        super().__init__(message)
+        self.last_state = last_state
+

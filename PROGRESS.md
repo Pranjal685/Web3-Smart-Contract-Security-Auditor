@@ -45,6 +45,8 @@
 - Scaffolded static PWA frontend served directly by FastAPI and added baseline UI routing tests.
 - Fixed PWA responsive layout and CSS Grid boundaries.
 - Hardened CSS grid column track boundaries via minmax and overflow containment.
+- Implemented Hard-Cap 3-iteration circuit breaker for cost efficiency.
+
 
 
 

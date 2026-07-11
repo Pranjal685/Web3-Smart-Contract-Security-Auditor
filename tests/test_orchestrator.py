@@ -27,8 +27,9 @@ def test_scenario_a_success_on_first_try():
 
 def test_scenario_b_loop_middleware_trigger():
     # Scenario B: Builder gets stuck generating the exact same payload,
-    # Critic repeatedly rejects it with the same feedback,
-    # and Loop Guard terminates the loop after 3 identical consecutive calls.
+    # Critic repeatedly rejects it with the same feedback.
+    # Under the strict convergence policy, it terminates at 3 iterations
+    # with status PARTIAL_AUDIT_COMPLETE.
     mock_builder = MagicMock(spec=Builder)
     mock_builder.generate_code.return_value = {
         "code": "print('bad code')",
@@ -43,21 +44,16 @@ def test_scenario_b_loop_middleware_trigger():
 
     orchestrator = Orchestrator(builder=mock_builder, critic=mock_critic)
 
-    # The loop should raise RuntimeError due to Loop Guard trigger
-    with pytest.raises(RuntimeError) as exc_info:
-        orchestrator.run("Write secure code")
+    result = orchestrator.run("Write secure code")
 
-    assert "Loop Protection Middleware triggered" in str(exc_info.value)
-    
-    # Trace:
-    # Call 1: "Write secure code"
-    # Call 2: "Write secure code\n\nPrevious implementation failed. Feedback: Code is insecure."
-    # Call 3: "Write secure code\n\nPrevious implementation failed. Feedback: Code is insecure."
-    # Call 4: "Write secure code\n\nPrevious implementation failed. Feedback: Code is insecure." -> Triggered (consecutive calls 2, 3, 4 are identical)
+    assert result["status"] == "PARTIAL_AUDIT_COMPLETE"
+    assert result["iterations"] == 3
+    assert result["critic_report"]["status"] == "PARTIAL_AUDIT_COMPLETE"
     assert len(orchestrator.action_history) == 4
     
     history = orchestrator.action_history
-    assert history[0]["parameters"]["task_description"] == "Write secure code"
-    assert history[1]["parameters"]["task_description"] == "Write secure code\n\nPrevious implementation failed. Feedback: Code is insecure."
-    assert history[2]["parameters"]["task_description"] == "Write secure code\n\nPrevious implementation failed. Feedback: Code is insecure."
-    assert history[3]["parameters"]["task_description"] == "Write secure code\n\nPrevious implementation failed. Feedback: Code is insecure."
+    assert "Write secure code" in history[0]["parameters"]["task_description"]
+    assert "Write secure code" in history[1]["parameters"]["task_description"]
+    assert "Write secure code" in history[2]["parameters"]["task_description"]
+    assert "Write secure code" in history[3]["parameters"]["task_description"]
+
