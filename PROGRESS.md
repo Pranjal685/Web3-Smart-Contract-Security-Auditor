@@ -41,4 +41,7 @@
 - Updated mocked Critic JSON response payloads in unit tests to conform to new schema.
 - Verified orchestrator boundaries and middleware behavior with all tests passing successfully.
 - Hardened Fault Tolerance with Dynamic Rate-Limit Backoff.
+- Scaffolded FastAPI Layer with Real-Time SSE Log Streaming.
+- Scaffolded static PWA frontend served directly by FastAPI and added baseline UI routing tests.
+
 

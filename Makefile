@@ -8,7 +8,7 @@ test:
 	venv/bin/python -m pytest
 
 lint:
-	venv/bin/python -m py_compile src/middleware/loop_guard.py tests/test_loop_guard.py src/api/sub_agents.py tests/test_sub_agents.py src/orchestrator.py tests/test_orchestrator.py src/cli.py tests/test_cli.py
+	venv/bin/python -m py_compile src/middleware/loop_guard.py tests/test_loop_guard.py src/api/sub_agents.py tests/test_sub_agents.py src/orchestrator.py tests/test_orchestrator.py src/cli.py tests/test_cli.py src/server.py tests/test_server.py
 
 check: lint test
 

@@ -65,7 +65,8 @@ class Orchestrator:
                 return {
                     "code": code,
                     "file_path": builder_payload.get("file_path", "solution.py"),
-                    "iterations": len(self.action_history)
+                    "iterations": len(self.action_history),
+                    "critic_report": critic_payload
                 }
             
             if verbose:

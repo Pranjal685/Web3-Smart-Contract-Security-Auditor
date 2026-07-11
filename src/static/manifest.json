@@ -1,0 +1,18 @@
+{
+  "short_name": "TokenGuard",
+  "name": "Token-Guard Smart Contract Security Auditor",
+  "description": "Progressive Web App frontend for Token-Guard DeFi Vulnerability Auditor",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "type": "image/svg+xml",
+      "sizes": "any",
+      "purpose": "any maskable"
+    }
+  ],
+  "start_url": "/",
+  "background_color": "#121212",
+  "theme_color": "#121212",
+  "display": "standalone",
+  "orientation": "any"
+}
