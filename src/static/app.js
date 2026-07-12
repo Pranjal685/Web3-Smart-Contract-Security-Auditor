@@ -22,8 +22,7 @@ const reportPlaceholder = document.getElementById("report-placeholder");
 const reportDetails = document.getElementById("report-details");
 const reportStatus = document.getElementById("report-status");
 const reportSeverityVal = document.getElementById("report-severity-val");
-const reportFeedback = document.getElementById("report-feedback");
-const reportRaw = document.getElementById("report-raw");
+const reportPointers = document.getElementById("report-pointers");
 
 // Utility to update header status
 function updateSystemStatus(text, state) {
@@ -57,8 +56,11 @@ function renderErrorInReport(message) {
   reportStatus.className = "report-status-badge badge-failed";
   reportSeverityVal.textContent = "UNKNOWN";
   reportSeverityVal.style.color = "var(--status-error)";
-  reportFeedback.textContent = `The orchestrator run encountered an error:\n\n${message}`;
-  reportRaw.textContent = JSON.stringify({ status: "error", error: message }, null, 2);
+  
+  reportPointers.innerHTML = "";
+  const li = document.createElement("li");
+  li.textContent = `The orchestrator run encountered an error: ${message}`;
+  reportPointers.appendChild(li);
 }
 
 // Render report in the card
@@ -87,8 +89,73 @@ function renderReport(data) {
     reportSeverityVal.style.color = "var(--text-primary)";
   }
 
-  reportFeedback.textContent = feedback;
-  reportRaw.textContent = JSON.stringify(data, null, 2);
+  // Clear existing pointers
+  reportPointers.innerHTML = "";
+
+  // Split feedback string programmatically by sentences or existing markdown points
+  let points = [];
+  const blocks = feedback.split(/\r?\n+/);
+  for (let block of blocks) {
+    block = block.trim();
+    if (!block) continue;
+    
+    // Strip leading list characters: -, *, +, 1., 2. etc.
+    const cleanBlock = block.replace(/^[\s\-\*\+\d\.\)]+\s*/, "").trim();
+    if (!cleanBlock) continue;
+    
+    // Split block into sentences
+    const sentences = cleanBlock.split(/(?<=[.!?])\s+(?=[A-Z0-9])/);
+    for (let s of sentences) {
+      s = s.trim();
+      if (s) {
+        points.push(s);
+      }
+    }
+  }
+
+  if (points.length === 0) {
+    points.push("No feedback provided.");
+  }
+
+  // Append points to report-pointers list
+  points.forEach(point => {
+    const li = document.createElement("li");
+    li.textContent = point;
+    reportPointers.appendChild(li);
+  });
+}
+
+// Filter and format logs dynamically based on content and bracket tags
+function processLog(msg) {
+  let cleanMessage = msg || "";
+
+  // If a log line contains raw orchestrator dictionary payloads, strip it
+  if (cleanMessage.includes("{'") || cleanMessage.includes('{"') || cleanMessage.includes("[{")) {
+    if (cleanMessage.includes("History:")) {
+      cleanMessage = cleanMessage.replace(/\s*History:[\s\S]*/i, "...");
+    } else if (cleanMessage.includes("with parameters:")) {
+      cleanMessage = cleanMessage.replace(/\s*with parameters:[\s\S]*/i, "...");
+    } else {
+      const match = cleanMessage.match(/[\{\[]/);
+      if (match) {
+        cleanMessage = cleanMessage.substring(0, match.index).trim() + "...";
+      }
+    }
+  }
+
+  // Format logs dynamically based on bracket tags
+  let logClass = "verbose";
+  if (cleanMessage.includes("[ERROR]")) {
+    logClass = "error";
+  } else if (cleanMessage.includes("[WARN]")) {
+    logClass = "warn";
+  } else if (cleanMessage.includes("[INFO]")) {
+    logClass = "info";
+  } else if (cleanMessage.includes("[VERBOSE]")) {
+    logClass = "verbose";
+  }
+
+  appendConsoleLine(cleanMessage, logClass);
 }
 
 // Main audit request execution
@@ -147,14 +214,7 @@ async function runAudit() {
             const payload = JSON.parse(rawData);
             
             if (payload.type === "log") {
-              const msg = payload.message || "";
-              let logClass = "verbose";
-              if (msg.startsWith("[INFO]")) {
-                logClass = "info";
-              } else if (msg.startsWith("[WARN]")) {
-                logClass = "warn";
-              }
-              appendConsoleLine(msg, logClass);
+              processLog(payload.message);
             } else if (payload.type === "error") {
               appendConsoleLine(`[ERROR] ${payload.message}`, "error");
               renderErrorInReport(payload.message);
@@ -177,7 +237,7 @@ async function runAudit() {
         try {
           const payload = JSON.parse(rawData);
           if (payload.type === "log") {
-            appendConsoleLine(payload.message, "verbose");
+            processLog(payload.message);
           } else if (payload.type === "error") {
             appendConsoleLine(`[ERROR] ${payload.message}`, "error");
             renderErrorInReport(payload.message);
@@ -229,3 +289,18 @@ async function runAudit() {
 
 // Wire Event Listener
 auditButton.addEventListener("click", runAudit);
+
+// Hero CTA smooth scroll to workspace
+const heroCtaStart = document.getElementById("hero-cta-start");
+if (heroCtaStart) {
+  heroCtaStart.addEventListener("click", () => {
+    const workspace = document.getElementById("workspace");
+    if (workspace) {
+      workspace.scrollIntoView({ behavior: "smooth" });
+      // Auto-focus the editor after scrolling
+      setTimeout(() => {
+        solidityCodeEl.focus();
+      }, 600);
+    }
+  });
+}

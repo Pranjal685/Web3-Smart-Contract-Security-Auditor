@@ -3,26 +3,37 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Token-Guard // Smart Contract Auditor</title>
+  <title>Token-Guard // Agentic Smart Contract Security Auditor</title>
+  <meta name="description" content="Token-Guard: AI-powered multi-agent security auditing for Solidity smart contracts. Detect vulnerabilities with agentic consensus.">
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" type="image/svg+xml" href="/icon.svg">
   <meta name="theme-color" content="#121212">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    /* DESIGN SYSTEM: Stark Monochrome & Technical Blue Accent */
+    /* ================================================================
+       DESIGN SYSTEM: Web3 Landing + Technical Workspace
+       ================================================================ */
     :root {
-      --bg-main: #0d0d0d;
-      --bg-panel: #141414;
-      --bg-console: #0a0a0a;
-      --border-color: #222222;
+      --bg-main: #121212;
+      --bg-panel: #1a1a1a;
+      --bg-console: #0c0c0c;
+      --border-color: #2d2d2d;
       --border-active: #444444;
-      --text-primary: #f2f2f2;
-      --text-muted: #777777;
-      --accent-color: #2f80ed; /* Technical Blue */
+      --text-primary: #ffffff;
+      --text-secondary: #b0b0b0;
+      --text-muted: #888888;
+      --accent-color: #2f80ed;
       --accent-hover: #1f6ed4;
-      --status-success: #10b981; /* Technical Green */
-      --status-error: #ef4444;   /* Technical Red */
-      --status-warning: #f59e0b; /* Technical Amber */
+      --accent-glow: rgba(47, 128, 237, 0.35);
+      --status-success: #10b981;
+      --status-error: #ef4444;
+      --status-warning: #f59e0b;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
       --font-mono: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Monaco, monospace;
+      --glass-bg: rgba(26, 26, 26, 0.6);
+      --glass-border: rgba(255, 255, 255, 0.06);
     }
 
     * {
@@ -31,56 +42,91 @@
       padding: 0;
     }
 
+    html {
+      scroll-behavior: smooth;
+    }
+
     body {
-      background-color: var(--bg-main);
+      background: radial-gradient(ellipse at top, #1a202c 0%, #121212 55%);
+      background-attachment: fixed;
       color: var(--text-primary);
-      font-family: var(--font-mono);
-      font-size: 14px;
+      font-family: var(--font-sans);
+      font-size: 16px;
       line-height: 1.6;
-      padding: 24px;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
     }
 
-    /* Scrollbar Styling */
-    ::-webkit-scrollbar {
-      width: 6px;
-      height: 6px;
-    }
-    ::-webkit-scrollbar-track {
-      background: var(--bg-main);
-    }
-    ::-webkit-scrollbar-thumb {
-      background: var(--border-color);
-    }
-    ::-webkit-scrollbar-thumb:hover {
-      background: var(--border-active);
+    /* Scrollbar */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg-main); }
+    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--border-active); }
+
+    /* ================================================================
+       ANIMATIONS
+       ================================================================ */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
 
-    header {
+    @keyframes pulse {
+      0%, 100% { opacity: 0.6; }
+      50% { opacity: 1; }
+    }
+
+    @keyframes subtleFloat {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-4px); }
+    }
+
+    /* ================================================================
+       STICKY NAV
+       ================================================================ */
+    .site-nav {
+      position: sticky;
+      top: 0;
+      z-index: 100;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding-bottom: 20px;
-      border-bottom: 1px solid var(--border-color);
-      margin-bottom: 24px;
+      padding: 16px 40px;
+      background: rgba(18, 18, 18, 0.7);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border-bottom: 1px solid var(--glass-border);
     }
 
-    .brand {
+    .nav-brand {
+      font-family: var(--font-mono);
       font-weight: 700;
+      font-size: 14px;
       letter-spacing: 1.5px;
+      color: var(--text-primary);
     }
 
-    .brand-accent {
+    .nav-brand-accent {
       color: var(--accent-color);
     }
 
-    .system-status {
+    .nav-actions {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .nav-status {
       display: flex;
       align-items: center;
       gap: 8px;
-      font-size: 12px;
+      font-family: var(--font-mono);
+      font-size: 11px;
       color: var(--text-muted);
       letter-spacing: 0.5px;
     }
@@ -109,16 +155,220 @@
       box-shadow: 0 0 8px var(--status-error);
     }
 
-    @keyframes pulse {
-      0%, 100% { opacity: 0.6; }
-      50% { opacity: 1; }
+    .btn-launch {
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 13px;
+      padding: 10px 24px;
+      background: var(--accent-color);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      transition: background 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+
+    .btn-launch:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 0 24px var(--accent-glow);
+      transform: translateY(-1px);
+    }
+
+    /* ================================================================
+       HERO SECTION
+       ================================================================ */
+    #hero {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 120px 40px 100px;
+      animation: fadeInUp 0.8s ease-out both;
+    }
+
+    .hero-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: var(--accent-color);
+      margin-bottom: 20px;
+    }
+
+    .hero-headline {
+      font-size: clamp(36px, 5.5vw, 72px);
+      font-weight: 900;
+      line-height: 1.08;
+      letter-spacing: -1.5px;
+      color: var(--text-primary);
+      max-width: 800px;
+      margin-bottom: 24px;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(16px, 2vw, 20px);
+      font-weight: 400;
+      color: var(--text-secondary);
+      max-width: 560px;
+      line-height: 1.6;
+      margin-bottom: 40px;
+    }
+
+    .hero-cta-group {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 16px;
+      padding: 16px 36px;
+      background: var(--accent-color);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      letter-spacing: 0.3px;
+      transition: background 0.2s ease, box-shadow 0.25s ease, transform 0.2s ease;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .btn-primary:hover {
+      background: var(--accent-hover);
+      box-shadow: 0 0 32px var(--accent-glow);
+      transform: translateY(-2px);
+    }
+
+    .btn-secondary {
+      font-family: var(--font-sans);
+      font-weight: 600;
+      font-size: 16px;
+      padding: 16px 36px;
+      background: transparent;
+      color: var(--text-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      cursor: pointer;
+      transition: border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn-secondary:hover {
+      border-color: var(--text-muted);
+      color: var(--text-primary);
+      transform: translateY(-2px);
+    }
+
+    /* ================================================================
+       FEATURES SECTION
+       ================================================================ */
+    #features {
+      padding: 60px 40px 80px;
+      max-width: 1100px;
+      margin: 0 auto;
+      animation: fadeInUp 0.8s ease-out 0.15s both;
+    }
+
+    .features-label {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+    }
+
+    @media (max-width: 768px) {
+      .features-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .feature-card {
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+      padding: 32px 28px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+    }
+
+    .feature-card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.35);
+      border-color: rgba(47, 128, 237, 0.2);
+    }
+
+    .feature-num {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      color: var(--accent-color);
+      margin-bottom: 12px;
+      letter-spacing: 0.5px;
+    }
+
+    .feature-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 10px;
+    }
+
+    .feature-desc {
+      font-size: 14px;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ================================================================
+       WORKSPACE SECTION
+       ================================================================ */
+    #workspace {
+      padding: 0 40px 60px;
+      max-width: 1400px;
+      margin: 0 auto;
+      width: 100%;
+      animation: fadeInUp 0.8s ease-out 0.3s both;
+    }
+
+    .workspace-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--border-color);
+      margin-bottom: 24px;
+    }
+
+    .workspace-label {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      color: var(--text-muted);
     }
 
     .dashboard-grid {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      gap: 2rem;
-      flex-grow: 1;
+      gap: 24px;
     }
 
     .dashboard-grid > .panel:first-child {
@@ -126,6 +376,10 @@
     }
 
     @media (max-width: 992px) {
+      #hero { padding: 80px 24px 60px; }
+      #features { padding: 40px 24px 60px; }
+      #workspace { padding: 0 24px 40px; }
+      .site-nav { padding: 14px 20px; }
       .dashboard-grid {
         grid-template-columns: 1fr;
       }
@@ -135,16 +389,24 @@
     }
 
     .panel {
-      background-color: var(--bg-panel);
-      border: 1px solid var(--border-color);
+      background: var(--glass-bg);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid var(--glass-border);
       display: flex;
       flex-direction: column;
       padding: 20px;
-      border-radius: 4px;
+      border-radius: 12px;
       min-width: 0;
+      transition: border-color 0.3s ease;
+    }
+
+    .panel:hover {
+      border-color: rgba(255, 255, 255, 0.1);
     }
 
     .panel-title {
+      font-family: var(--font-mono);
       font-size: 12px;
       color: var(--text-muted);
       letter-spacing: 1px;
@@ -157,6 +419,9 @@
       align-items: center;
     }
 
+    /* ================================================================
+       WORKSPACE: EDITOR
+       ================================================================ */
     .editor-container {
       display: flex;
       flex-direction: column;
@@ -178,13 +443,15 @@
       line-height: 1.5;
       resize: vertical;
       outline: none;
-      border-radius: 2px;
+      border-radius: 8px;
       overflow-x: auto;
       white-space: pre;
+      transition: border-color 0.2s ease, box-shadow 0.25s ease;
     }
 
     textarea.solidity-editor:focus {
-      border-color: var(--border-active);
+      border-color: var(--accent-color);
+      box-shadow: 0 0 20px var(--accent-glow);
     }
 
     .audit-action-bar {
@@ -194,31 +461,40 @@
     }
 
     button.audit-btn {
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 14px;
       background-color: var(--accent-color);
       color: #ffffff;
       border: none;
-      padding: 12px 24px;
-      font-family: var(--font-mono);
-      font-weight: 700;
-      letter-spacing: 1px;
+      padding: 14px 28px;
+      letter-spacing: 0.5px;
       cursor: pointer;
-      border-radius: 2px;
-      transition: background-color 0.2s ease, opacity 0.2s ease;
+      border-radius: 8px;
+      transition: background-color 0.2s ease, box-shadow 0.25s ease, transform 0.2s ease;
       display: flex;
       align-items: center;
       gap: 8px;
+      box-shadow: 0 0 16px var(--accent-glow);
     }
 
     button.audit-btn:hover {
       background-color: var(--accent-hover);
+      box-shadow: 0 0 24px var(--accent-glow);
+      transform: translateY(-1px);
     }
 
     button.audit-btn:disabled {
       background-color: var(--border-color);
       color: var(--text-muted);
       cursor: not-allowed;
+      box-shadow: none;
+      transform: none;
     }
 
+    /* ================================================================
+       WORKSPACE: CONSOLE & REPORT
+       ================================================================ */
     .console-section {
       display: flex;
       flex-direction: column;
@@ -233,24 +509,26 @@
       padding: 12px;
       overflow-y: auto;
       overflow-x: auto;
+      font-family: var(--font-mono);
       font-size: 12px;
       color: var(--text-muted);
       white-space: pre-wrap;
       word-break: break-all;
       overflow-wrap: anywhere;
-      border-radius: 2px;
+      border-radius: 8px;
     }
 
     .console-line {
       margin-bottom: 4px;
+      font-family: var(--font-mono);
     }
 
     .console-line.info {
-      color: var(--text-primary);
+      color: var(--accent-color);
     }
 
     .console-line.verbose {
-      color: var(--text-muted);
+      color: #a0a0a0;
     }
 
     .console-line.warn {
@@ -272,7 +550,7 @@
       background-color: var(--bg-console);
       border: 1px solid var(--border-color);
       padding: 16px;
-      border-radius: 2px;
+      border-radius: 8px;
       overflow-y: auto;
       overflow-x: auto;
       display: flex;
@@ -291,6 +569,8 @@
       color: var(--text-muted);
       text-align: center;
       gap: 8px;
+      font-family: var(--font-mono);
+      font-size: 13px;
     }
 
     .report-details {
@@ -300,74 +580,85 @@
       height: 100%;
     }
 
-    .report-header {
+    .report-badge-wrapper {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 1px solid var(--border-color);
-      padding-bottom: 12px;
+      padding: 12px 16px;
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      font-family: var(--font-mono);
     }
 
     .report-status-badge {
-      padding: 4px 8px;
+      display: inline-block;
+      padding: 6px 14px;
       font-weight: 700;
       font-size: 12px;
-      border-radius: 2px;
+      border-radius: 6px;
       text-transform: uppercase;
+      letter-spacing: 1px;
+      font-family: var(--font-mono);
     }
 
     .badge-passed {
-      background-color: rgba(16, 185, 129, 0.15);
-      color: var(--status-success);
+      background-color: var(--status-success);
+      color: #121212;
       border: 1px solid var(--status-success);
     }
 
     .badge-failed {
-      background-color: rgba(239, 68, 68, 0.15);
-      color: var(--status-error);
+      background-color: var(--status-error);
+      color: #121212;
       border: 1px solid var(--status-error);
     }
 
     .report-severity {
       font-size: 13px;
+      font-family: var(--font-mono);
     }
 
     .severity-value {
       font-weight: 700;
     }
 
-    .report-feedback {
-      background-color: var(--bg-panel);
+    .report-pointers-wrapper {
+      background-color: var(--bg-console);
       border: 1px solid var(--border-color);
-      padding: 12px;
-      border-radius: 2px;
-      font-size: 13px;
-      white-space: pre-wrap;
-      overflow-x: auto;
-      word-break: break-all;
-      overflow-wrap: anywhere;
-    }
-
-    .report-raw {
-      font-size: 11px;
-      color: var(--text-muted);
-      border: 1px solid var(--border-color);
-      padding: 8px;
-      background-color: rgba(0, 0, 0, 0.2);
-      border-radius: 2px;
-      max-height: 120px;
+      padding: 16px;
+      border-radius: 8px;
+      flex-grow: 1;
       overflow-y: auto;
-      overflow-x: auto;
-      white-space: pre-wrap;
-      word-break: break-all;
-      overflow-wrap: anywhere;
     }
 
-    footer {
+    #report-pointers {
+      list-style-type: square;
+      padding-left: 20px;
+      margin: 0;
+      font-family: var(--font-mono);
+    }
+
+    #report-pointers li {
+      font-size: 13px;
+      line-height: 1.8;
+      color: var(--text-primary);
+      margin-bottom: 12px;
+      letter-spacing: 0.3px;
+    }
+
+    #report-pointers li:last-child {
+      margin-bottom: 0;
+    }
+
+    /* ================================================================
+       FOOTER
+       ================================================================ */
+    .site-footer {
       text-align: center;
-      margin-top: 24px;
-      padding-top: 16px;
+      padding: 32px 40px;
       border-top: 1px solid var(--border-color);
+      font-family: var(--font-mono);
       font-size: 11px;
       color: var(--text-muted);
     }
@@ -375,91 +666,127 @@
 </head>
 <body>
 
-  <header>
-    <div class="brand">
-      TOKEN-GUARD <span class="brand-accent">//</span> SMART CONTRACT AUDITOR
+  <!-- ============================================================
+       STICKY NAV
+       ============================================================ -->
+  <nav class="site-nav">
+    <div class="nav-brand">
+      TOKEN-GUARD <span class="nav-brand-accent">//</span> AUDITOR
     </div>
-    <div class="system-status">
-      <div id="status-dot" class="status-indicator active"></div>
-      <span id="status-text">SYSTEM STANDBY</span>
+    <div class="nav-actions">
+      <div class="nav-status">
+        <div id="status-dot" class="status-indicator active"></div>
+        <span id="status-text">SYSTEM STANDBY</span>
+      </div>
+      <button class="btn-launch" onclick="document.getElementById('workspace').scrollIntoView({behavior:'smooth'})">Launch App</button>
     </div>
-  </header>
+  </nav>
 
-  <main class="dashboard-grid">
-    <!-- Left panel for solidity code input -->
-    <section class="panel">
-      <div class="panel-title">
-        <span>INPUT_SOLIDITY_SOURCE</span>
-        <span style="color: var(--text-muted); font-size: 10px;">V0.8.20+</span>
+  <!-- ============================================================
+       HERO SECTION
+       ============================================================ -->
+  <section id="hero">
+    <div class="hero-eyebrow">MULTI-AGENT SECURITY ROUTER</div>
+    <h1 class="hero-headline">Agentic Security for Decentralized Finance</h1>
+    <p class="hero-subtitle">
+      AI-driven Builder and Critic agents reach consensus on your Solidity contract&rsquo;s vulnerabilities &mdash; in under 3 iterations, with zero human review overhead.
+    </p>
+    <div class="hero-cta-group">
+      <button class="btn-primary" id="hero-cta-start">Start Auditing</button>
+      <button class="btn-secondary" id="hero-cta-features" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">How It Works</button>
+    </div>
+  </section>
+
+  <!-- ============================================================
+       FEATURES SECTION
+       ============================================================ -->
+  <section id="features">
+    <div class="features-label">MULTI-AGENT ROUTER ARCHITECTURE &amp; WORKFLOW</div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-num">01 // INGESTION</div>
+        <div class="feature-title">Source Parsing</div>
+        <p class="feature-desc">Ingests Solidity source code directly into the sandboxed pipeline, performing structural parsing and metadata layout validation.</p>
       </div>
-      <div class="editor-container">
-        <textarea id="solidity-code" class="solidity-editor" spellcheck="false" wrap="off">// SPDX-License-Identifier: MIT
-pragma solidity ^0.8.20;
-
-contract VulnerableBank {
-    mapping(address => uint256) public balances;
-
-    function deposit() public payable {
-        require(msg.value > 0, "Deposit amount must be greater than 0");
-        balances[msg.sender] += msg.value;
-    }
-
-    function withdraw() public {
-        uint256 amount = balances[msg.sender];
-        require(amount > 0, "No balance to withdraw");
-
-        // VULNERABILITY: External call before state update (Reentrancy)
-        (bool success, ) = msg.sender.call{value: amount}("");
-        require(success, "Transfer failed");
-
-        balances[msg.sender] = 0;
-    }
-}
-</textarea>
+      <div class="feature-card">
+        <div class="feature-num">02 // CONSENSUS</div>
+        <div class="feature-title">Agent Consensus</div>
+        <p class="feature-desc">Orchestrates parallel execution between Builder Agent (analyzing vulnerabilities) and Critic Agent (auditing assertions) for strict validation.</p>
       </div>
-      <div class="audit-action-bar">
-        <button id="audit-button" class="audit-btn">AUDIT CONTRACT</button>
+      <div class="feature-card">
+        <div class="feature-num">03 // CONVERGENCE</div>
+        <div class="feature-title">Cost-Efficient Termination</div>
+        <p class="feature-desc">Applies real-time Loop Protection Middleware to prune redundant runs, ensuring convergence to an optimal patch state under 3 iterations.</p>
       </div>
-    </section>
+    </div>
+  </section>
 
-    <!-- Right panel for console outputs and report cards -->
-    <section class="panel">
-      <div class="panel-title">LIVE_EXECUTION_STREAM</div>
-      <div class="console-section">
-        <div id="console-output" class="console-output"></div>
-      </div>
+  <!-- ============================================================
+       WORKSPACE SECTION (auditing tool)
+       ============================================================ -->
+  <section id="workspace">
+    <div class="workspace-header">
+      <span class="workspace-label">TOKEN-GUARD WORKSPACE</span>
+    </div>
 
-      <div class="panel-title">FINAL_CRITIC_REPORT</div>
-      <div class="report-section">
-        <div id="report-card" class="report-card">
-          <!-- Placeholder shown initially -->
-          <div id="report-placeholder" class="report-placeholder">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-              <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-              <line x1="9" y1="9" x2="15" y2="9"/>
-              <line x1="9" y1="13" x2="15" y2="13"/>
-              <line x1="9" y1="17" x2="11" y2="17"/>
-            </svg>
-            <div>No audit performed yet.</div>
-          </div>
+    <main class="dashboard-grid">
+      <!-- Left panel: Solidity code input -->
+      <section class="panel">
+        <div class="panel-title">
+          <span>INPUT_SOLIDITY_SOURCE</span>
+          <span style="color: var(--text-muted); font-size: 10px;">V0.8.20+</span>
+        </div>
+        <div class="editor-container">
+          <textarea id="solidity-code" class="solidity-editor" spellcheck="false" wrap="off" placeholder="// Paste your Solidity contract here..."></textarea>
+        </div>
+        <div class="audit-action-bar">
+          <button id="audit-button" class="audit-btn">AUDIT CONTRACT</button>
+        </div>
+      </section>
 
-          <!-- Report detail view -->
-          <div id="report-details" class="report-details">
-            <div class="report-header">
-              <span id="report-status" class="report-status-badge"></span>
-              <div class="report-severity">
-                SEVERITY: <span id="report-severity-val" class="severity-value"></span>
+      <!-- Right panel: Console output + report -->
+      <section class="panel">
+        <div class="panel-title">LIVE_EXECUTION_STREAM</div>
+        <div class="console-section">
+          <div id="console-output" class="console-output"></div>
+        </div>
+
+        <div class="panel-title">FINAL_CRITIC_REPORT</div>
+        <div class="report-section">
+          <div id="report-card" class="report-card">
+            <!-- Placeholder shown initially -->
+            <div id="report-placeholder" class="report-placeholder">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                <line x1="9" y1="9" x2="15" y2="9"/>
+                <line x1="9" y1="13" x2="15" y2="13"/>
+                <line x1="9" y1="17" x2="11" y2="17"/>
+              </svg>
+              <div>No audit performed yet.</div>
+            </div>
+
+            <!-- Report detail view -->
+            <div id="report-details" class="report-details">
+              <div class="report-badge-wrapper">
+                <span id="report-status" class="report-status-badge"></span>
+                <div class="report-severity">
+                  SEVERITY: <span id="report-severity-val" class="severity-value"></span>
+                </div>
+              </div>
+              <div class="report-pointers-wrapper">
+                <ul id="report-pointers"></ul>
               </div>
             </div>
-            <div class="report-feedback" id="report-feedback"></div>
-            <pre class="report-raw" id="report-raw"></pre>
           </div>
         </div>
-      </div>
-    </section>
-  </main>
+      </section>
+    </main>
+  </section>
 
-  <footer>
+  <!-- ============================================================
+       FOOTER
+       ============================================================ -->
+  <footer class="site-footer">
     TOKEN-GUARD AGENTIC ROUTER // SECURE AUDITING SYSTEM
   </footer>
 
