@@ -77,5 +77,10 @@
 - **Documentation Upgrade**: Upgraded root `README.md` with full system architecture details (consensual routing loop, LoopGuard early termination, exploit simulator, visual patch difference viewer, report exporter), added the '🎯 Motivation & Origin' section near the top, and provided environment setup instructions using the newly created secure `.env.example` template.
 - Documentation Upgrade — **COMPLETE** ✅
 
+## Phase 4: Monolith Rendering & Packaging
+
+### Done
+- Configured unified backend static mounting, refactored frontend endpoints to relative paths, and generated root render.yaml blueprint
+
 ### In Progress
 - None.
