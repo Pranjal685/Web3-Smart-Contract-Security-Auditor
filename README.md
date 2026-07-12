@@ -11,6 +11,12 @@ Token-Guard is an agentic router that orchestrates Builder and Critic AI agents 
 
 ---
 
+## 🎯 Motivation & Origin
+
+Token-Guard started as an intensive, deep-dive research project into harness engineering and autonomous agent orchestration loops. Driven by the challenge of moving beyond static security scripts, the goal was to explore how multi-agent architectures could dynamically converge on complex smart contract logic flaws—like reentrancy and precision loss—without manual human intervention hooks. What began as a foundational exploration of agent loop mechanics evolved over a month of rapid prototyping into a production-grade, compute-efficient security pipeline. This project stands as a definitive proof-of-concept demonstrating that dynamic, localized LLM consensus models can achieve rapid, automated vulnerability remediation with optimized token efficiency.
+
+---
+
 ## Architecture
 
 Token-Guard enforces a strict **separation of concerns** across three core components to prevent monolithic generative coding hazards:
@@ -41,6 +47,23 @@ Token-Guard enforces a strict **separation of concerns** across three core compo
 | **Loop Guard** | Regex middleware, terminates on 3 identical consecutive calls | Hard-cap 3-iteration limit |
 
 Both agents use **Google Gemini Flash** for inference via raw HTTP (`urllib.request`), with zero external AI SDK dependencies.
+
+### Core Orchestration Pipeline & Subsystems
+
+1. **The Multi-Agent Consensus Loop**  
+   The execution engine manages an interactive pipeline between the **Builder Agent** and the **Critic Agent**. The Builder acts as a *DeFi Vulnerability Analyzer*, parsing the Solidity input to locate flaws (such as reentrancy, access control bypasses, and overflow issues) and generating raw technical analysis. The Critic acts as the *Lead Smart Contract Auditor*, evaluating the Builder's proposal on its own merits. If flaws remain, the Critic rejects the patch and feeds structured debug context back to the next iteration of the Builder.
+
+2. **Compute Optimization Flow (`LoopGuard`)**  
+   To prevent runaway token consumption and infinite loops, the Orchestrator routes all agent calls through the `LoopGuard` middleware. This layer runs a regex-based sequence analyzer to detect if identical parameters are invoked 3 times consecutively. Crucially, the system implements **short-circuit early termination**: if the Critic flags the contract as `"Secure"` or returns `"passed": true`, the loop terminates instantly at $O(1)$ efficiency, bypassing unnecessary subsequent iteration steps.
+
+3. **Automated Exploit Simulator**  
+   To prove vulnerability exploitability, the Critic Agent generates a fully functional Solidity attacker contract (`contract Attacker { ... }`) targetting the identified vulnerability. This simulator is dynamically triggered exclusively when the severity level is classified as **High** or **Critical**, providing auditors with immediate Proof-of-Concept (PoC) code to reproduce the issue.
+
+4. **Visual Code Patching**  
+   The client-side UI integrates an interactive line-level Diff Viewer utilizing `jsdiff`. When the Critic Agent outputs the final remediated contract in the `patched_code` field, the frontend compares it line-by-line with the original user input, rendering added lines (`+` green) and removed lines (`-` red) with syntax highlight styling.
+
+5. **Report Exporter**  
+   Upon audit completion, users can export a complete Markdown security report compile-generated directly from the client-side DOM state. The exporter compiles the audit status, severity, Critic feedback points, PoC exploit code, and final patched Solidity contract into a clean, download-ready Markdown file.
 
 ---
 
@@ -98,37 +121,62 @@ Both agents use **Google Gemini Flash** for inference via raw HTTP (`urllib.requ
 - **Python 3.11+**
 - **Google Gemini API Key** — Get one from [Google AI Studio](https://aistudio.google.com/apikey)
 
-### Installation
+### Installation & Setup
 
-```bash
-# Clone the repository
-git clone https://github.com/Pranjal685/Web3-Smart-Contract-Security-Auditor.git
-cd Web3-Smart-Contract-Security-Auditor
+1. **Clone the Repository:**
+   ```bash
+   git clone https://github.com/Pranjal685/Web3-Smart-Contract-Security-Auditor.git
+   cd Web3-Smart-Contract-Security-Auditor
+   ```
 
-# Create virtual environment and install dependencies
-python -m venv venv
-source venv/bin/activate          # Linux/macOS
-# venv\Scripts\activate           # Windows
+2. **Initialize Virtual Environment & Install Dependencies:**
+   ```bash
+   python -m venv venv
+   
+   # Activate on Linux/macOS:
+   source venv/bin/activate
+   # Activate on Windows PowerShell:
+   # .\venv\Scripts\Activate.ps1
+   
+   pip install -r requirements.txt
+   ```
 
-pip install -r requirements.txt
-```
+3. **Configure Environment Variables:**
+   Copy the provided environment template to a secure local file (which is automatically blocked by `.gitignore`):
+   ```bash
+   cp .env.example .env
+   ```
+   Open the `.env` file and replace `your_api_key_here` with your actual Google Gemini API Key:
+   ```env
+   GEMINI_API_KEY="your-actual-api-key-value"
+   ```
 
-### Set API Key
-
-```bash
-export GEMINI_API_KEY="your-api-key-here"
-
-# Windows PowerShell:
-# $env:GEMINI_API_KEY="your-api-key-here"
-```
+4. **Load the Environment Variables:**
+   * **Linux/macOS:**
+     ```bash
+     export $(cat .env | xargs)
+     ```
+   * **Windows PowerShell:**
+     ```powershell
+     Get-Content .env | ForEach-Object {
+         if ($_ -and $_ -notmatch '^#') {
+             $parts = $_ -split '=', 2
+             if ($parts.Length -eq 2) {
+                 $key = $parts[0].Trim()
+                 $val = $parts[1].Trim().Trim('"').Trim("'")
+                 [System.Environment]::SetEnvironmentVariable($key, $val, "Process")
+             }
+         }
+     }
+     ```
 
 ### Run the Web Server
 
+Launch the FastAPI backend with:
 ```bash
 uvicorn src.server:app --reload --host 0.0.0.0 --port 8000
 ```
-
-Then open [http://localhost:8000](http://localhost:8000) in your browser.
+Open [http://localhost:8000](http://localhost:8000) in your web browser to access the dynamic auditing workspace.
 
 ### Run via CLI
 

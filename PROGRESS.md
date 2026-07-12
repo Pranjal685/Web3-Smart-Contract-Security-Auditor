@@ -57,3 +57,25 @@
 - Implemented Exploit Simulator (PoC Generator) and dynamic frontend Attack Vector panel.
 - Refined Critic prompt to allow early loop termination while preserving PoC generation.
 - Implemented client-side Markdown Audit Report blob generation and download.
+
+## Phase 5: Pre-Deployment Hardening
+
+### Done
+- **Secret Scanning**: Scanned `src/static/app.js` (624 lines) and `src/static/index.html` (1107 lines) — zero hardcoded API keys, tokens, or credentials found. All API keys are loaded from `os.environ` on the backend only.
+- **Gitignore Audit**: Hardened `.gitignore` to explicitly block `.env`, `.env.*`, `venv/`, `.venv/`, `__pycache__/`, `*.pyc`, and `.pytest_cache/`.
+- **Git Cache Verification**: Confirmed no sensitive files (`venv/`, `__pycache__/`, `.env`) are tracked in the git index — no `git rm --cached` commands were necessary.
+- Phase 1 (Secret Scanning & Credential Management) — **COMPLETE** ✅
+- **XSS DOM Injection Audit**: Audited all 8 `innerHTML` call sites in `app.js` — 6 are empty-string clears (`= ""`), 2 are static template literals with zero dynamic interpolation. No untrusted data ever touches `innerHTML`.
+- **Secure Text Injection Verification**: Confirmed all 12 dynamic backend payload injections (`payload.message`, `reportData.severity`, `reportData.feedback`, `reportData.patched_code`, `reportData.poc_exploit`) use exclusively `textContent`. Zero use of `insertAdjacentHTML`, `outerHTML`, `document.write`, or `eval`.
+- **User Input Neutralization**: User-supplied Solidity code is read via `.value` (string property), serialized via `JSON.stringify()` for fetch, and rendered via `textContent` in the diff viewer — fully neutralized against script injection.
+- Phase 2 (XSS & Injection Hardening) — **COMPLETE** ✅
+- **Python Backend Audit**: Audited `orchestrator.py` (130 lines), `sub_agents.py` (180 lines), `server.py` (110 lines) — zero unused imports, zero commented-out dev blocks, all functions have strict type hints and docstrings. No changes needed.
+- **Dead CSS Purge**: Cross-referenced all 50 CSS class definitions in `index.html` against HTML body usages and JS dynamic class assignments (`className`/`classList`) — zero orphaned or dead CSS classes found. No changes needed.
+- **Debug Noise Purge**: Found 5 console statements in `app.js` — removed 1 `console.log` (SW registration success noise), preserved 4 `console.error` statements (legitimate error handlers for SSE parse failures and audit errors). Browser console now silent in normal operation.
+- **Test Verification**: All 20 tests pass (pytest 9.1.1, 0.33s).
+- Phase 3 (Technical Debt & AI Slop Eradication) — **COMPLETE** ✅
+- **Documentation Upgrade**: Upgraded root `README.md` with full system architecture details (consensual routing loop, LoopGuard early termination, exploit simulator, visual patch difference viewer, report exporter), added the '🎯 Motivation & Origin' section near the top, and provided environment setup instructions using the newly created secure `.env.example` template.
+- Documentation Upgrade — **COMPLETE** ✅
+
+### In Progress
+- None.
