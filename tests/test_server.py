@@ -24,7 +24,8 @@ def test_audit_endpoint_success():
                 "critic_report": {
                     "passed": True,
                     "severity": "Secure",
-                    "feedback": "No security issues identified."
+                    "feedback": "No security issues identified.",
+                    "patched_code": "// SPDX-License-Identifier: MIT\ncontract Test {}"
                 }
             }
             

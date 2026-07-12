@@ -52,6 +52,7 @@
 - Hardened sw.js with skipWaiting and active cache-eviction rules for development hot-reloading.
 - Refined visual theme with Space Grotesk typography, soft mint tech accents, and glassmorphic navbar boundaries.
 - Upgraded architecture feature cards with interactive Web3 data module styling.
+- Implemented inline Visual Diff Viewer for patched code resolution using jsdiff.
 
 
 

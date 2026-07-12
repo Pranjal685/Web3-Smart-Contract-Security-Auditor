@@ -24,6 +24,10 @@ const reportStatus = document.getElementById("report-status");
 const reportSeverityVal = document.getElementById("report-severity-val");
 const reportPointers = document.getElementById("report-pointers");
 
+// Diff Viewer Elements
+const diffPlaceholder = document.getElementById("diff-placeholder");
+const diffOutput = document.getElementById("diff-output");
+
 // Utility to update header status
 function updateSystemStatus(text, state) {
   statusText.textContent = text;
@@ -125,6 +129,44 @@ function renderReport(data) {
   });
 }
 
+// Render inline diff between original and patched code
+function renderDiffViewer(originalCode, patchedCode) {
+  if (!patchedCode || !patchedCode.trim()) {
+    // No patched code available — keep placeholder visible
+    return;
+  }
+
+  // Use jsdiff to compute line-level differences
+  const diff = Diff.diffLines(originalCode, patchedCode);
+
+  diffOutput.innerHTML = "";
+
+  diff.forEach((part) => {
+    const lines = part.value.split("\n");
+    // diffLines may produce a trailing empty string from split, skip it
+    lines.forEach((line, idx) => {
+      if (idx === lines.length - 1 && line === "") return;
+      const lineEl = document.createElement("div");
+      lineEl.className = "diff-line";
+
+      if (part.added) {
+        lineEl.classList.add("diff-added");
+        lineEl.textContent = "+ " + line;
+      } else if (part.removed) {
+        lineEl.classList.add("diff-removed");
+        lineEl.textContent = "- " + line;
+      } else {
+        lineEl.textContent = "  " + line;
+      }
+
+      diffOutput.appendChild(lineEl);
+    });
+  });
+
+  diffPlaceholder.style.display = "none";
+  diffOutput.style.display = "block";
+}
+
 // Filter and format logs dynamically based on content and bracket tags
 function processLog(msg) {
   let cleanMessage = msg || "";
@@ -179,6 +221,11 @@ async function runAudit() {
       AUDIT PROCESSING...
     </div>
   `;
+
+  // Reset diff viewer panel
+  diffOutput.style.display = "none";
+  diffOutput.innerHTML = "";
+  diffPlaceholder.style.display = "flex";
 
   try {
     const response = await fetch("/api/audit", {
@@ -254,6 +301,10 @@ async function runAudit() {
     // Finalize report render if available
     if (reportData) {
       renderReport(reportData);
+      // Render diff viewer if patched_code is available
+      const originalCode = solidityCodeEl.value;
+      const patchedCode = reportData.patched_code || "";
+      renderDiffViewer(originalCode, patchedCode);
       updateSystemStatus("AUDIT COMPLETED", "active");
     } else {
       // If done but no report was parsed

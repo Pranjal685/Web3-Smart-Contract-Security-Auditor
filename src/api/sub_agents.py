@@ -114,6 +114,7 @@ class Critic:
     def evaluate_code(self, code: str, context: str = "") -> Dict[str, Any]:
         """
         Evaluates the Analyzer's findings and the original Solidity code.
+        Returns a dict with passed, severity, feedback, and patched_code fields.
         """
         prompt = (
             f"You are a Lead Smart Contract Auditor. Review the DeFi Vulnerability Analyzer's findings and the original Solidity code.\n"
@@ -123,8 +124,10 @@ class Critic:
             f"{{\n"
             f"  \"passed\": true or false,\n"
             f"  \"severity\": \"Critical\", \"High\", \"Medium\", \"Low\", or \"Secure\",\n"
-            f"  \"feedback\": \"Detailed explanation of the vulnerability and how to patch it\"\n"
+            f"  \"feedback\": \"Detailed explanation of the vulnerability and how to patch it\",\n"
+            f"  \"patched_code\": \"The complete, fully remediated Solidity contract with all vulnerabilities fixed. Reproduce the entire contract source code with corrections applied.\"\n"
             f"}}\n"
+            f"The patched_code field is REQUIRED. It must contain the complete remediated Solidity source code.\n"
             f"Do not write any other text outside this JSON."
         )
         
@@ -141,13 +144,16 @@ class Critic:
             passed = bool(eval_data.get("passed", False))
             severity = str(eval_data.get("severity", "Secure"))
             feedback = str(eval_data.get("feedback", "No feedback provided."))
+            patched_code = str(eval_data.get("patched_code", ""))
         except json.JSONDecodeError:
             passed = False
             severity = "Critical"
             feedback = f"Failed to parse JSON evaluation from Gemini. Raw response: {response_text}"
+            patched_code = ""
             
         return {
             "passed": passed,
             "severity": severity,
-            "feedback": feedback
+            "feedback": feedback,
+            "patched_code": patched_code
         }

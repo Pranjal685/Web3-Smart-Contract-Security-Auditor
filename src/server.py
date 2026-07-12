@@ -96,7 +96,9 @@ async def audit_stream(contract: str) -> AsyncGenerator[str, None]:
         if isinstance(result, Exception):
             yield f"data: {json.dumps({'type': 'error', 'message': str(result)})}\n\n"
         else:
-            yield f"data: {json.dumps({'type': 'report', 'data': result.get('critic_report')})}\n\n"
+            report_payload = result.get('critic_report', {})
+            report_payload['patched_code'] = report_payload.get('patched_code', '')
+            yield f"data: {json.dumps({'type': 'report', 'data': report_payload})}\n\n"
     finally:
         log_queue_var.reset(token)
 
