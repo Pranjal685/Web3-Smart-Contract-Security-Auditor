@@ -85,6 +85,7 @@ class Orchestrator:
                 # 4. Invoke the Critic to evaluate the code
                 critic_payload = self.critic.evaluate_code(code, context=modified_initial_task)
                 passed = critic_payload.get("passed", False)
+                severity = critic_payload.get("severity", "")
                 feedback = critic_payload.get("feedback", "")
                 
                 # Save the current state as the last known best version
@@ -95,11 +96,14 @@ class Orchestrator:
                     "critic_report": critic_payload
                 }
 
-                # 5. If Critic approves, return final code
-                if passed:
+                # 5. Early termination: short-circuit if Critic approves OR severity is Secure
+                is_secure = severity.lower() == "secure" if severity else False
+                if passed or is_secure:
                     if verbose:
-                        print(f"[VERBOSE] Critic approved code after {len(self.action_history)} iteration(s).")
+                        reason = "passed=True" if passed else f"severity={severity}"
+                        print(f"[VERBOSE] Early termination triggered ({reason}) after {len(self.action_history)} iteration(s).")
                     return {
+                        "status": "SUCCESS",
                         "code": code,
                         "file_path": builder_payload.get("file_path", "solution.py"),
                         "iterations": len(self.action_history),
