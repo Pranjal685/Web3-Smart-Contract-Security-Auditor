@@ -304,3 +304,144 @@ if (heroCtaStart) {
     }
   });
 }
+
+// ================================================================
+// CRYPTOGRAPHIC DECRYPTION TEXT REVEAL
+// ================================================================
+function decryptText(element, finalString, durationMs = 1800) {
+  const hexChars = "0123456789ABCDEF";
+  const len = finalString.length;
+  const intervalMs = 30;
+  const totalSteps = Math.floor(durationMs / intervalMs);
+  let step = 0;
+
+  // Initially show random hex for the full length
+  element.textContent = Array.from({ length: len }, () =>
+    hexChars[Math.floor(Math.random() * hexChars.length)]
+  ).join("");
+
+  const timer = setInterval(() => {
+    step++;
+    const resolvedCount = Math.floor((step / totalSteps) * len);
+    let display = "";
+    for (let i = 0; i < len; i++) {
+      if (i < resolvedCount) {
+        display += finalString[i];
+      } else {
+        display += hexChars[Math.floor(Math.random() * hexChars.length)];
+      }
+    }
+    element.textContent = display;
+
+    if (step >= totalSteps) {
+      clearInterval(timer);
+      element.textContent = finalString;
+    }
+  }, intervalMs);
+}
+
+// Trigger decryption on the hero headline
+const heroHeadline = document.getElementById("hero-headline");
+if (heroHeadline) {
+  const finalText = heroHeadline.textContent;
+  decryptText(heroHeadline, finalText, 1800);
+}
+
+// ================================================================
+// CONSENSUS GRID — Interactive Particle Network Canvas
+// ================================================================
+(function initParticleNetwork() {
+  const canvas = document.getElementById("web3-canvas");
+  if (!canvas) return;
+  const ctx = canvas.getContext("2d");
+
+  let width, height;
+  let mouse = { x: -9999, y: -9999 };
+  const NODE_COUNT = 60;
+  const CONNECT_DIST = 140;
+  const MOUSE_RADIUS = 180;
+  const nodes = [];
+
+  function resize() {
+    width = canvas.width = window.innerWidth;
+    height = canvas.height = window.innerHeight;
+  }
+  resize();
+  window.addEventListener("resize", resize);
+
+  // Track mouse position
+  document.addEventListener("mousemove", (e) => {
+    mouse.x = e.clientX;
+    mouse.y = e.clientY;
+  });
+
+  // Seed nodes
+  for (let i = 0; i < NODE_COUNT; i++) {
+    nodes.push({
+      x: Math.random() * width,
+      y: Math.random() * height,
+      vx: (Math.random() - 0.5) * 0.4,
+      vy: (Math.random() - 0.5) * 0.4,
+      radius: Math.random() * 1.5 + 0.8,
+    });
+  }
+
+  function tick() {
+    ctx.clearRect(0, 0, width, height);
+
+    for (let i = 0; i < nodes.length; i++) {
+      const n = nodes[i];
+
+      // Mouse repulsion
+      const mdx = n.x - mouse.x;
+      const mdy = n.y - mouse.y;
+      const mDist = Math.sqrt(mdx * mdx + mdy * mdy);
+      if (mDist < MOUSE_RADIUS && mDist > 0) {
+        const force = (MOUSE_RADIUS - mDist) / MOUSE_RADIUS * 0.6;
+        n.vx += (mdx / mDist) * force;
+        n.vy += (mdy / mDist) * force;
+      }
+
+      // Damping
+      n.vx *= 0.98;
+      n.vy *= 0.98;
+
+      // Move
+      n.x += n.vx;
+      n.y += n.vy;
+
+      // Wrap around edges
+      if (n.x < 0) n.x = width;
+      if (n.x > width) n.x = 0;
+      if (n.y < 0) n.y = height;
+      if (n.y > height) n.y = 0;
+
+      // Draw node
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(47, 128, 237, 0.5)";
+      ctx.fill();
+
+      // Draw connections
+      for (let j = i + 1; j < nodes.length; j++) {
+        const o = nodes[j];
+        const dx = n.x - o.x;
+        const dy = n.y - o.y;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < CONNECT_DIST) {
+          const alpha = 1 - dist / CONNECT_DIST;
+          ctx.beginPath();
+          ctx.moveTo(n.x, n.y);
+          ctx.lineTo(o.x, o.y);
+          ctx.strokeStyle = `rgba(47, 128, 237, ${0.2 * alpha})`;
+          ctx.lineWidth = 0.6;
+          ctx.stroke();
+        }
+      }
+    }
+
+    requestAnimationFrame(tick);
+  }
+
+  requestAnimationFrame(tick);
+})();
