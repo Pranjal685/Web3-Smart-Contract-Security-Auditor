@@ -114,21 +114,37 @@ class Critic:
     def evaluate_code(self, code: str, context: str = "") -> Dict[str, Any]:
         """
         Evaluates the Analyzer's findings and the original Solidity code.
-        Returns a dict with passed, severity, feedback, and patched_code fields.
+        Returns a dict with passed, severity, feedback, patched_code, and poc_exploit fields.
+        poc_exploit is populated only when severity is High or Critical.
         """
         prompt = (
-            f"You are a Lead Smart Contract Auditor. Review the DeFi Vulnerability Analyzer's findings and the original Solidity code.\n"
-            f"Original Solidity Code (Context): {context}\n"
-            f"Analyzer's Findings: {code}\n\n"
-            f"You MUST return a JSON object with exactly the following structure:\n"
+            f"You are a Lead Smart Contract Auditor. Your job is to evaluate the CURRENT STATE of the code provided "
+            f"by the Builder Agent, not to repeat the findings of the original vulnerability analysis.\n\n"
+            f"=== ORIGINAL SOLIDITY CODE (for reference only) ===\n"
+            f"{context}\n\n"
+            f"=== BUILDER AGENT'S CURRENT CODE / FINDINGS ===\n"
+            f"{code}\n\n"
+            f"=== EVALUATION RULES (FOLLOW STRICTLY) ===\n"
+            f"RULE 1 — STATE TRANSITION: Evaluate the Builder's provided code on its OWN MERITS.\n"
+            f"  - If the Builder has successfully remediated the vulnerability, you MUST set `passed: true` "
+            f"and `severity: 'Secure'`. Do NOT carry the original severity onto already-fixed code.\n"
+            f"  - Do NOT label fixed or patched code as Critical, High, Medium, or Low.\n"
+            f"  - Only set `passed: false` if the Builder's current code STILL contains an exploitable flaw.\n\n"
+            f"RULE 2 — POC EXPLOIT PRESERVATION: If the ORIGINAL input code (shown above) contained a High or "
+            f"Critical vulnerability, you MUST STILL write a functioning Solidity attacker contract "
+            f"(e.g., `contract Attacker {{ ... }}`) that targets the ORIGINAL vulnerability — even if the Builder "
+            f"has now fixed it. Output this in the `poc_exploit` field. "
+            f"If the original code was not High or Critical, leave `poc_exploit` null.\n\n"
+            f"RULE 3 — SCHEMA ADHERENCE: You MUST return a JSON object with exactly this structure and no text outside it:\n"
             f"{{\n"
             f"  \"passed\": true or false,\n"
             f"  \"severity\": \"Critical\", \"High\", \"Medium\", \"Low\", or \"Secure\",\n"
-            f"  \"feedback\": \"Detailed explanation of the vulnerability and how to patch it\",\n"
-            f"  \"patched_code\": \"The complete, fully remediated Solidity contract with all vulnerabilities fixed. Reproduce the entire contract source code with corrections applied.\"\n"
+            f"  \"feedback\": \"Detailed explanation of remaining issues, or confirmation that the code is now secure.\",\n"
+            f"  \"patched_code\": \"The complete final remediated Solidity contract.\",\n"
+            f"  \"poc_exploit\": null\n"
             f"}}\n"
-            f"The patched_code field is REQUIRED. It must contain the complete remediated Solidity source code.\n"
-            f"Do not write any other text outside this JSON."
+            f"The `patched_code` field is REQUIRED and must contain the complete Solidity source.\n"
+            f"Do not write any other text outside this JSON object."
         )
         
         response_text = _call_gemini(prompt)
@@ -145,15 +161,19 @@ class Critic:
             severity = str(eval_data.get("severity", "Secure"))
             feedback = str(eval_data.get("feedback", "No feedback provided."))
             patched_code = str(eval_data.get("patched_code", ""))
+            poc_raw = eval_data.get("poc_exploit", None)
+            poc_exploit = str(poc_raw).strip() if poc_raw else ""
         except json.JSONDecodeError:
             passed = False
             severity = "Critical"
             feedback = f"Failed to parse JSON evaluation from Gemini. Raw response: {response_text}"
             patched_code = ""
+            poc_exploit = ""
             
         return {
             "passed": passed,
             "severity": severity,
             "feedback": feedback,
-            "patched_code": patched_code
+            "patched_code": patched_code,
+            "poc_exploit": poc_exploit
         }

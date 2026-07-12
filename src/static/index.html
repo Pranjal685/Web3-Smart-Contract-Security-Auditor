@@ -1,17 +1,23 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Token-Guard // Agentic Smart Contract Security Auditor</title>
-  <meta name="description" content="Token-Guard: AI-powered multi-agent security auditing for Solidity smart contracts. Detect vulnerabilities with agentic consensus.">
+  <meta name="description"
+    content="Token-Guard: AI-powered multi-agent security auditing for Solidity smart contracts. Detect vulnerabilities with agentic consensus.">
   <link rel="manifest" href="/manifest.json">
   <link rel="icon" type="image/svg+xml" href="/icon.svg">
   <meta name="theme-color" content="#121212">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap" rel="stylesheet">
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/7.0.0/diff.min.js" integrity="sha512-immo//J6lKoR+nRIFDPxoxfL2nd/0N3w8l4LwH4HSSVovtUjab5kbh4AhixLH5z9mIv37llY9Q2i8AfEDXyYjw==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap"
+    rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jsdiff/7.0.0/diff.min.js"
+    integrity="sha512-immo//J6lKoR+nRIFDPxoxfL2nd/0N3w8l4LwH4HSSVovtUjab5kbh4AhixLH5z9mIv37llY9Q2i8AfEDXyYjw=="
+    crossorigin="anonymous" referrerpolicy="no-referrer"></script>
   <style>
     /* ================================================================
        DESIGN SYSTEM: Web3 Landing + Technical Workspace
@@ -58,10 +64,23 @@
     }
 
     /* Scrollbar */
-    ::-webkit-scrollbar { width: 6px; height: 6px; }
-    ::-webkit-scrollbar-track { background: var(--bg-main); }
-    ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 3px; }
-    ::-webkit-scrollbar-thumb:hover { background: var(--border-active); }
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: var(--bg-main);
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--border-color);
+      border-radius: 3px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: var(--border-active);
+    }
 
     /* ================================================================
        ANIMATIONS
@@ -71,6 +90,7 @@
         opacity: 0;
         transform: translateY(30px);
       }
+
       to {
         opacity: 1;
         transform: translateY(0);
@@ -78,18 +98,37 @@
     }
 
     @keyframes pulse {
-      0%, 100% { opacity: 0.6; }
-      50% { opacity: 1; }
+
+      0%,
+      100% {
+        opacity: 0.6;
+      }
+
+      50% {
+        opacity: 1;
+      }
     }
 
     @keyframes subtleFloat {
-      0%, 100% { transform: translateY(0); }
-      50% { transform: translateY(-4px); }
+
+      0%,
+      100% {
+        transform: translateY(0);
+      }
+
+      50% {
+        transform: translateY(-4px);
+      }
     }
 
     @keyframes borderSpin {
-      0%   { --border-angle: 0deg; }
-      100% { --border-angle: 360deg; }
+      0% {
+        --border-angle: 0deg;
+      }
+
+      100% {
+        --border-angle: 360deg;
+      }
     }
 
     /* ================================================================
@@ -395,19 +434,32 @@
       gap: 24px;
     }
 
-    .dashboard-grid > .panel:first-child {
+    .dashboard-grid>.panel:first-child {
       min-width: 45%;
     }
 
     @media (max-width: 992px) {
-      #hero { padding: 80px 24px 60px; }
-      #features { padding: 40px 24px 60px; }
-      #workspace { padding: 0 24px 40px; }
-      .site-nav { padding: 14px 20px; }
+      #hero {
+        padding: 80px 24px 60px;
+      }
+
+      #features {
+        padding: 40px 24px 60px;
+      }
+
+      #workspace {
+        padding: 0 24px 40px;
+      }
+
+      .site-nav {
+        padding: 14px 20px;
+      }
+
       .dashboard-grid {
         grid-template-columns: 1fr;
       }
-      .dashboard-grid > .panel:first-child {
+
+      .dashboard-grid>.panel:first-child {
         min-width: 100%;
       }
     }
@@ -432,16 +484,14 @@
       inset: -1px;
       border-radius: 13px;
       padding: 1.5px;
-      background: conic-gradient(
-        from var(--border-angle, 0deg),
-        transparent 40%,
-        var(--accent-color) 50%,
-        transparent 60%
-      );
+      background: conic-gradient(from var(--border-angle, 0deg),
+          transparent 40%,
+          var(--accent-color) 50%,
+          transparent 60%);
       -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-              mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+      mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
       -webkit-mask-composite: xor;
-              mask-composite: exclude;
+      mask-composite: exclude;
       animation: borderSpin 4s linear infinite;
       z-index: -1;
       pointer-events: none;
@@ -455,12 +505,10 @@
     }
 
     .panel:hover::before {
-      background: conic-gradient(
-        from var(--border-angle, 0deg),
-        transparent 30%,
-        var(--accent-color) 50%,
-        transparent 70%
-      );
+      background: conic-gradient(from var(--border-angle, 0deg),
+          transparent 30%,
+          var(--accent-color) 50%,
+          transparent 70%);
     }
 
     .panel-title {
@@ -720,6 +768,7 @@
       font-size: 11px;
       color: var(--text-muted);
     }
+
     /* ================================================================
        DIFF VIEWER STYLES
        ================================================================ */
@@ -781,12 +830,109 @@
       initial-value: 0deg;
       inherits: false;
     }
+
+    /* ================================================================
+       EXPLOIT SIMULATOR PANEL
+       ================================================================ */
+    .exploit-panel {
+      position: relative;
+      background: rgba(20, 5, 5, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid rgba(255, 71, 87, 0.2);
+      box-shadow: inset 0 0 20px rgba(255, 71, 87, 0.1);
+      border-radius: 12px;
+      padding: 20px;
+      overflow: hidden;
+      z-index: 1;
+    }
+
+    .exploit-panel-title {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: rgba(255, 71, 87, 0.8);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      margin-bottom: 12px;
+      border-bottom: 1px solid rgba(255, 71, 87, 0.15);
+      padding-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .exploit-warning-badge {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: rgba(255, 71, 87, 0.9);
+      background: rgba(255, 71, 87, 0.1);
+      border: 1px solid rgba(255, 71, 87, 0.3);
+      border-radius: 4px;
+      padding: 3px 8px;
+      text-transform: uppercase;
+    }
+
+    #exploit-code-output {
+      margin: 0;
+      padding: 16px;
+      background: rgba(10, 2, 2, 0.9);
+      border: 1px solid rgba(255, 71, 87, 0.15);
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 13px;
+      line-height: 1.6;
+      color: #fca5a5;
+      white-space: pre;
+      overflow-x: auto;
+      overflow-y: auto;
+      max-height: 480px;
+      word-break: keep-all;
+      overflow-wrap: normal;
+    }
+
+    /* ================================================================
+       DOWNLOAD REPORT BUTTON
+       ================================================================ */
+    #download-report-btn {
+      display: none;
+      font-family: var(--font-mono);
+      font-weight: 700;
+      font-size: 13px;
+      letter-spacing: 1px;
+      padding: 13px 28px;
+      background: transparent;
+      color: var(--accent-color);
+      border: 1px solid rgba(94, 234, 212, 0.35);
+      border-radius: 8px;
+      cursor: pointer;
+      transition: border-color 0.2s ease, box-shadow 0.25s ease, background 0.2s ease, transform 0.2s ease;
+      align-items: center;
+      gap: 8px;
+    }
+
+    #download-report-btn:hover {
+      border-color: var(--accent-color);
+      background: rgba(94, 234, 212, 0.07);
+      box-shadow: 0 0 18px rgba(94, 234, 212, 0.25);
+      transform: translateY(-1px);
+    }
+
+    .download-action-bar {
+      grid-column: 1 / -1;
+      display: flex;
+      justify-content: flex-end;
+      padding-top: 4px;
+    }
   </style>
 </head>
+
 <body>
 
   <!-- Particle network canvas background -->
-  <canvas id="web3-canvas" style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;opacity:0.4;"></canvas>
+  <canvas id="web3-canvas"
+    style="position:fixed;top:0;left:0;width:100vw;height:100vh;z-index:-1;opacity:0.4;"></canvas>
 
   <!-- ============================================================
        STICKY NAV
@@ -800,7 +946,8 @@
         <div id="status-dot" class="status-indicator active"></div>
         <span id="status-text">SYSTEM STANDBY</span>
       </div>
-      <button class="btn-launch" onclick="document.getElementById('workspace').scrollIntoView({behavior:'smooth'})">Launch App</button>
+      <button class="btn-launch"
+        onclick="document.getElementById('workspace').scrollIntoView({behavior:'smooth'})">Launch App</button>
     </div>
   </nav>
 
@@ -811,11 +958,13 @@
     <div class="hero-eyebrow">MULTI-AGENT SECURITY ROUTER</div>
     <h1 class="hero-headline" id="hero-headline">Agentic Security for Decentralized Finance</h1>
     <p class="hero-subtitle">
-      AI-driven Builder and Critic agents reach consensus on your Solidity contract&rsquo;s vulnerabilities &mdash; in under 3 iterations, with zero human review overhead.
+      AI-driven Builder and Critic agents reach consensus on your Solidity contract&rsquo;s vulnerabilities &mdash; in
+      under 3 iterations, with zero human review overhead.
     </p>
     <div class="hero-cta-group">
       <button class="btn-primary" id="hero-cta-start">Start Auditing</button>
-      <button class="btn-secondary" id="hero-cta-features" onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">How It Works</button>
+      <button class="btn-secondary" id="hero-cta-features"
+        onclick="document.getElementById('features').scrollIntoView({behavior:'smooth'})">How It Works</button>
     </div>
   </section>
 
@@ -828,17 +977,20 @@
       <div class="feature-card">
         <div class="feature-num">01 // INGESTION</div>
         <div class="feature-title">Source Parsing</div>
-        <p class="feature-desc">Ingests Solidity source code directly into the sandboxed pipeline, performing structural parsing and metadata layout validation.</p>
+        <p class="feature-desc">Ingests Solidity source code directly into the sandboxed pipeline, performing structural
+          parsing and metadata layout validation.</p>
       </div>
       <div class="feature-card">
         <div class="feature-num">02 // CONSENSUS</div>
         <div class="feature-title">Agent Consensus</div>
-        <p class="feature-desc">Orchestrates parallel execution between Builder Agent (analyzing vulnerabilities) and Critic Agent (auditing assertions) for strict validation.</p>
+        <p class="feature-desc">Orchestrates parallel execution between Builder Agent (analyzing vulnerabilities) and
+          Critic Agent (auditing assertions) for strict validation.</p>
       </div>
       <div class="feature-card">
         <div class="feature-num">03 // CONVERGENCE</div>
         <div class="feature-title">Cost-Efficient Termination</div>
-        <p class="feature-desc">Applies real-time Loop Protection Middleware to prune redundant runs, ensuring convergence to an optimal patch state under 3 iterations.</p>
+        <p class="feature-desc">Applies real-time Loop Protection Middleware to prune redundant runs, ensuring
+          convergence to an optimal patch state under 3 iterations.</p>
       </div>
     </div>
   </section>
@@ -859,7 +1011,8 @@
           <span style="color: var(--text-muted); font-size: 10px;">V0.8.20+</span>
         </div>
         <div class="editor-container">
-          <textarea id="solidity-code" class="solidity-editor" spellcheck="false" wrap="off" placeholder="// Paste your Solidity contract here..."></textarea>
+          <textarea id="solidity-code" class="solidity-editor" spellcheck="false" wrap="off"
+            placeholder="// Paste your Solidity contract here..."></textarea>
         </div>
         <div class="audit-action-bar">
           <button id="audit-button" class="audit-btn">AUDIT CONTRACT</button>
@@ -878,11 +1031,12 @@
           <div id="report-card" class="report-card">
             <!-- Placeholder shown initially -->
             <div id="report-placeholder" class="report-placeholder">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
-                <line x1="9" y1="9" x2="15" y2="9"/>
-                <line x1="9" y1="13" x2="15" y2="13"/>
-                <line x1="9" y1="17" x2="11" y2="17"/>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                <line x1="9" y1="9" x2="15" y2="9" />
+                <line x1="9" y1="13" x2="15" y2="13" />
+                <line x1="9" y1="17" x2="11" y2="17" />
               </svg>
               <div>No audit performed yet.</div>
             </div>
@@ -902,6 +1056,15 @@
           </div>
         </div>
       </section>
+      <!-- Full-width panel: Exploit Simulator (Attack Vector Simulation) -->
+      <section id="exploit-panel" class="exploit-panel diff-panel-full" style="display: none;">
+        <div class="exploit-panel-title">
+          <span>ATTACK_VECTOR_SIMULATION</span>
+          <span class="exploit-warning-badge">⚡ POC EXPLOIT</span>
+        </div>
+        <pre id="exploit-code-output"><code></code></pre>
+      </section>
+
       <!-- Full-width panel: Visual Code Diff Viewer -->
       <section class="panel diff-panel-full" id="diff-panel">
         <div class="panel-title">
@@ -909,17 +1072,25 @@
           <span style="color: var(--text-muted); font-size: 10px;">INLINE DIFF</span>
         </div>
         <div id="diff-placeholder" class="diff-placeholder">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
-            <polyline points="14 2 14 8 20 8"/>
-            <line x1="16" y1="13" x2="8" y2="13"/>
-            <line x1="16" y1="17" x2="8" y2="17"/>
-            <polyline points="10 9 9 9 8 9"/>
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <line x1="16" y1="13" x2="8" y2="13" />
+            <line x1="16" y1="17" x2="8" y2="17" />
+            <polyline points="10 9 9 9 8 9" />
           </svg>
           <div>No patched code available yet. Run an audit to generate a diff.</div>
         </div>
         <div id="diff-output" class="diff-container" style="display: none;"></div>
       </section>
+
+      <!-- Download Audit Report action bar -->
+      <div class="download-action-bar">
+        <button id="download-report-btn">
+          ⬇ DOWNLOAD AUDIT REPORT
+        </button>
+      </div>
     </main>
   </section>
 
@@ -932,4 +1103,5 @@
 
   <script src="/app.js"></script>
 </body>
+
 </html>

@@ -28,6 +28,13 @@ const reportPointers = document.getElementById("report-pointers");
 const diffPlaceholder = document.getElementById("diff-placeholder");
 const diffOutput = document.getElementById("diff-output");
 
+// Exploit Simulator Panel Elements
+const exploitPanel = document.getElementById("exploit-panel");
+const exploitCodeOutput = document.getElementById("exploit-code-output");
+
+// Download Report Button
+const downloadReportBtn = document.getElementById("download-report-btn");
+
 // Utility to update header status
 function updateSystemStatus(text, state) {
   statusText.textContent = text;
@@ -227,6 +234,13 @@ async function runAudit() {
   diffOutput.innerHTML = "";
   diffPlaceholder.style.display = "flex";
 
+  // Reset exploit simulator panel
+  exploitPanel.style.display = "none";
+  exploitCodeOutput.textContent = "";
+
+  // Hide download button until new audit completes
+  downloadReportBtn.style.display = "none";
+
   try {
     const response = await fetch("/api/audit", {
       method: "POST",
@@ -305,6 +319,19 @@ async function runAudit() {
       const originalCode = solidityCodeEl.value;
       const patchedCode = reportData.patched_code || "";
       renderDiffViewer(originalCode, patchedCode);
+
+      // Render exploit simulator panel if poc_exploit is present
+      const pocExploit = (reportData.poc_exploit || "").trim();
+      if (pocExploit) {
+        exploitCodeOutput.textContent = pocExploit;
+        exploitPanel.style.display = "block";
+      } else {
+        exploitPanel.style.display = "none";
+      }
+
+      // Reveal the Download Audit Report button
+      downloadReportBtn.style.display = "flex";
+
       updateSystemStatus("AUDIT COMPLETED", "active");
     } else {
       // If done but no report was parsed
@@ -340,6 +367,104 @@ async function runAudit() {
 
 // Wire Event Listener
 auditButton.addEventListener("click", runAudit);
+
+// ================================================================
+// MARKDOWN AUDIT REPORT DOWNLOAD
+// ================================================================
+downloadReportBtn.addEventListener("click", () => {
+  // Gather current state from the DOM
+  const severity = (document.getElementById("report-severity-val")?.textContent || "UNKNOWN").trim();
+  const passed = (document.getElementById("report-status")?.textContent || "").trim();
+
+  // Collect bullet-point feedback from report-pointers list
+  const pointerItems = document.querySelectorAll("#report-pointers li");
+  const bulletPoints = Array.from(pointerItems)
+    .map((li) => `- ${li.textContent.trim()}`)
+    .join("\n");
+
+  // Grab PoC exploit code (raw text, may be empty)
+  const pocExploit = (document.getElementById("exploit-code-output")?.textContent || "").trim();
+
+  // Grab the patched code from the diff output text content (line prefix stripped)
+  // We reconstruct it from the solidity editor's current value as the base, but surface
+  // the diff-output innerHTML as a reference. Instead, capture from the textarea directly
+  // since patched code may not be separately stored — use the raw diff lines marked "+"
+  const diffLines = document.querySelectorAll("#diff-output .diff-line");
+  let patchedCodeLines = [];
+  let hasDiff = false;
+  diffLines.forEach((lineEl) => {
+    const raw = lineEl.textContent;
+    if (lineEl.classList.contains("diff-removed")) return; // skip removed lines
+    if (lineEl.classList.contains("diff-added")) {
+      hasDiff = true;
+      patchedCodeLines.push(raw.substring(2)); // strip leading "+ "
+    } else {
+      patchedCodeLines.push(raw.substring(2)); // strip leading "  "
+    }
+  });
+  const patchedCodeBlock = patchedCodeLines.length > 0
+    ? patchedCodeLines.join("\n")
+    : "(No patched code generated for this audit.)";
+
+  // Compose the Markdown report
+  const timestamp = new Date().toISOString();
+  let markdownContent = `# Token-Guard Audit Report
+
+**Generated:** ${timestamp}
+
+---
+
+## Audit Verdict
+
+| Field     | Value          |
+|-----------|----------------|
+| **Status**   | ${passed}   |
+| **Severity** | ${severity} |
+
+---
+
+## Critic Report
+
+${bulletPoints || "- No feedback recorded."}
+
+`;
+
+  if (pocExploit) {
+    markdownContent += `---
+
+## Proof-of-Concept Exploit
+
+\`\`\`solidity
+${pocExploit}
+\`\`\`
+
+`;
+  }
+
+  markdownContent += `---
+
+## Patched Code
+
+\`\`\`solidity
+${patchedCodeBlock}
+\`\`\`
+
+---
+
+*Report produced by Token-Guard Agentic Router. For educational and security research purposes only.*
+`;
+
+  // Create blob and trigger download
+  const blob = new Blob([markdownContent], { type: "text/markdown" });
+  const url = URL.createObjectURL(blob);
+  const anchor = document.createElement("a");
+  anchor.href = url;
+  anchor.download = "Token-Guard-Audit.md";
+  document.body.appendChild(anchor);
+  anchor.click();
+  document.body.removeChild(anchor);
+  URL.revokeObjectURL(url);
+});
 
 // Hero CTA smooth scroll to workspace
 const heroCtaStart = document.getElementById("hero-cta-start");

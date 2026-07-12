@@ -45,7 +45,9 @@ def test_critic_only_returns_evaluation_payload_passing():
         model_output_json = json.dumps({
             "passed": True,
             "severity": "Secure",
-            "feedback": "No vulnerabilities found."
+            "feedback": "No vulnerabilities found.",
+            "patched_code": "",
+            "poc_exploit": None
         })
         # Mocking markdown JSON block
         mock_response.read.return_value = _make_mock_gemini_response(f"```json\n{model_output_json}\n```")
@@ -55,12 +57,13 @@ def test_critic_only_returns_evaluation_payload_passing():
         critic = Critic()
         payload = critic.evaluate_code("Reentrancy vulnerability detected...", context="Test context")
 
-        # Verify Critic returns evaluation payload with patched_code field
-        assert list(payload.keys()) == ["passed", "severity", "feedback", "patched_code"]
+        # Verify Critic returns evaluation payload with patched_code and poc_exploit fields
+        assert list(payload.keys()) == ["passed", "severity", "feedback", "patched_code", "poc_exploit"]
         assert payload["passed"] is True
         assert payload["severity"] == "Secure"
         assert payload["feedback"] == "No vulnerabilities found."
         assert payload["patched_code"] == ""
+        assert payload["poc_exploit"] == ""
 
 def test_critic_only_returns_evaluation_payload_failing():
     with patch("urllib.request.urlopen") as mock_urlopen:
@@ -68,7 +71,9 @@ def test_critic_only_returns_evaluation_payload_failing():
         model_output_json = json.dumps({
             "passed": False,
             "severity": "High",
-            "feedback": "Contract contains a reentrancy hazard."
+            "feedback": "Contract contains a reentrancy hazard.",
+            "patched_code": "",
+            "poc_exploit": "contract Attacker { function attack() external { /* exploit */ } }"
         })
         mock_response.read.return_value = _make_mock_gemini_response(model_output_json)
         mock_response.__enter__.return_value = mock_response
@@ -77,11 +82,12 @@ def test_critic_only_returns_evaluation_payload_failing():
         critic = Critic()
         payload = critic.evaluate_code("Reentrancy vulnerability detected...", context="Test context")
 
-        assert list(payload.keys()) == ["passed", "severity", "feedback", "patched_code"]
+        assert list(payload.keys()) == ["passed", "severity", "feedback", "patched_code", "poc_exploit"]
         assert payload["passed"] is False
         assert payload["severity"] == "High"
         assert payload["feedback"] == "Contract contains a reentrancy hazard."
         assert payload["patched_code"] == ""
+        assert "Attacker" in payload["poc_exploit"]
 
 def test_missing_api_key_raises_value_error():
     # Temporarily remove key to test validation

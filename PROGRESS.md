@@ -54,8 +54,6 @@
 - Upgraded architecture feature cards with interactive Web3 data module styling.
 - Implemented inline Visual Diff Viewer for patched code resolution using jsdiff.
 - Implemented early termination (short-circuit) in the orchestrator convergence loop.
-
-
-
-
-
+- Implemented Exploit Simulator (PoC Generator) and dynamic frontend Attack Vector panel.
+- Refined Critic prompt to allow early loop termination while preserving PoC generation.
+- Implemented client-side Markdown Audit Report blob generation and download.
