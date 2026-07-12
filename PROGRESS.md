@@ -49,6 +49,8 @@
 - Implemented integrated Web3 landing framework and pointer-based reporting UI.
 - Overhauled frontend into an animated Web3 landing page wrapper.
 - Implemented Sherlock/CertiK-inspired Web3 aesthetics: Decryption text, Canvas node network, and Animated terminal borders.
+- Hardened sw.js with skipWaiting and active cache-eviction rules for development hot-reloading.
+- Refined visual theme with Space Grotesk typography, soft mint tech accents, and glassmorphic navbar boundaries.
 
 
 

@@ -419,7 +419,7 @@ if (heroHeadline) {
       // Draw node
       ctx.beginPath();
       ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
-      ctx.fillStyle = "rgba(47, 128, 237, 0.5)";
+      ctx.fillStyle = "rgba(94, 234, 212, 0.5)";
       ctx.fill();
 
       // Draw connections
@@ -433,7 +433,7 @@ if (heroHeadline) {
           ctx.beginPath();
           ctx.moveTo(n.x, n.y);
           ctx.lineTo(o.x, o.y);
-          ctx.strokeStyle = `rgba(47, 128, 237, ${0.2 * alpha})`;
+          ctx.strokeStyle = `rgba(94, 234, 212, ${0.2 * alpha})`;
           ctx.lineWidth = 0.6;
           ctx.stroke();
         }
